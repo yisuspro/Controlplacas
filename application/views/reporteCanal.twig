@@ -1,0 +1,239 @@
+{% import "tools/menu.twig" as menus %}
+{% import "tools/forms.twig" as form %}
+{% extends "tools/dashboard_base.twig" %}
+
+{% block title %}login{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+{{ menus.menu()}}
+<div class="main-panel" id="main-panel">
+    {{ menus.menu_2()}}
+    <div style="height: 62px; "></div>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title"> Grafica reporte caida de canales</h4>
+        </div>
+        <div class="card-body">
+
+            <div id="chart-container">
+                <canvas id="graphCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Tabla reporte caida de canales</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="sample_1" class="display" style="width:96% ;font-size: small;">
+                    <thead class="text-primary">
+                        <th>
+                            ID SICOV
+                        </th>
+                        <th>
+                            MINUTOS NT
+                        </th>
+                        <th>
+                            MINUTOS IDEALES
+                        </th>
+                        <th>
+                            % FALLA
+                        </th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% block footer %}
+
+
+{% endblock %}
+
+{% endblock %}
+{% block java %}
+
+<script>
+    $(document).ready(function() {
+        var ctx = document.getElementById('graphCanvas').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['{% for datos in data %}', '{{ datos.ATCN_FK_canal }} ', '{% endfor %}'],
+                datasets: [{
+                    label: '% no trabajado',
+                    data: ['{% for datos in data %}', '{{ datos.porcentaje }} ', '{% endfor %}'],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+
+
+        var dt;
+        dt = $('#sample_1');
+        dt.DataTable({
+            lengthMenu: [
+                [5, 10, 25, 50, -1],
+                [5, 10, 25, 50, "Todo"],
+            ],
+            "order": [
+                [3, "des"]
+            ],
+            "ajax": {
+                url: "{{ base_url() }}Canales/reporteTablaFechas/{{ date1 }}/{{ date2 }}",
+                type: 'GET'
+            },
+            "scrollX": true,
+            dom: 'Bfrtip',
+            buttons: [{
+                    extend: 'print',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-print',
+                    text: '<i class="fa fa-print"></i>'
+                },
+                {
+                    extend: 'copy',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-copy',
+                    text: '<i class="fa fa-files-o">copy</i>'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-pdf',
+                    text: '<i class="fa fa-file-pdf-o">pdf</i>',
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-excel',
+                    text: '<i class="fa fa-file-excel-o">excel</i>',
+                },
+                {
+                    extend: 'csv',
+                    className: ' btn  btn-circle btn-icon-only btn-success tooltips t-csv ',
+                    text: '<i class="fa fa-file-text-o ">csv </i>',
+                },
+
+            ],
+            columns: [{
+                    data: 'ATCN_FK_canal',
+                },
+                {
+                    data: 'minutosNoTrabajados',
+                },
+                {
+                    data: 'minutosIdeales',
+                    
+                },
+                {
+                    data: 'porcentaje',
+                    render:  $.fn.dataTable.render.number( ',', '.', 3, '%' ),
+                    class: 'form-control'
+                },
+            ],
+            pageLength: 10,
+            rowCallback: function(row, data) {
+                if (data['porcentaje'] >= 0 && data['porcentaje'] < 0.5) {
+                    $($(row).find("td")[3]).css("background-color", "#90EE90");
+                    $($(row).find("td")[3]).css("color", "#000000");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                } else if(data['porcentaje'] >= 0.5 && data['porcentaje'] < 1) {
+                    $($(row).find("td")[3]).css("background-color", "#40FF00");
+                    $($(row).find("td")[3]).css("color", "#ffffff");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                }else if(data['porcentaje'] >= 1 && data['porcentaje'] < 3) {
+                    $($(row).find("td")[3]).css("background-color", "#BFFF00");
+                    $($(row).find("td")[3]).css("color", "#ffffff");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                }else if(data['porcentaje'] >= 3 && data['porcentaje'] < 5) {
+                    $($(row).find("td")[3]).css("background-color", "#FFBF00");
+                    $($(row).find("td")[3]).css("color", "#ffffff");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                }else if(data['porcentaje'] >= 5 && data['porcentaje'] < 10) {
+                    $($(row).find("td")[3]).css("background-color", "#FF4000");
+                    $($(row).find("td")[3]).css("color", "#ffffff");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                }else if(data['porcentaje'] >= 10) {
+                    $($(row).find("td")[3]).css("background-color", "#FF0000");
+                    $($(row).find("td")[3]).css("color", "#ffffff");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                }
+            },
+        });
+
+
+    });
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,126 @@
+{% import "tools/forms.twig" as form %}
+<div class="card-header">
+    <h4 class="card-title"> Canales caidos {% for dato in data %} {{id}} {% endfor %} </h4>
+</div>
+<div class="card-body">
+    <div class="table-responsive">
+        <table id="historial" class="display dt-responsive" style="width:100%">
+            <thead class="text-primary">
+                <th>
+                    ID SOLICITUD
+                </th>
+                <th>
+                    ID SICOV
+                </th>
+                <th>
+                    HORA DE CAIDA
+                </th>
+                <th>
+                    HORA DE SUBIDA
+                </th>
+                <th>
+                    CAUSAS
+                </th>
+            </thead>
+
+        </table>
+    </div>
+    <div  style="float: right;margin-right: 5%;">
+    {{ form.buttom('atras','fa fa-arrow-left','Regresar','','danger ')}}
+    </div>
+    
+</div>
+
+
+
+<script>
+    $(document).ready(function() {
+        var dt;
+        var dato = {{ id }};
+        dt = $('#historial');
+        dt.DataTable({
+            lengthMenu: [
+                [5, 10, 25, 50, -1],
+                [5, 10, 25, 50, "Todo"],
+            ],
+            "ajax": {
+                url: "{{ base_url() }}Canales/listarActividadCanal/" + dato,
+                type: 'GET'
+            },
+            "scrollX": true,
+            dom: 'Bfrtip',
+            buttons: [{
+                    extend: 'print',
+                    className: 'btn btn-circle btn-icon-only btn-default tooltips t-print',
+                    text: '<i class="fa fa-print"></i>'
+                },
+                {
+                    extend: 'copy',
+                    className: 'btn btn-circle btn-icon-only btn-default tooltips t-copy',
+                    text: '<i class="fa fa-files-o">copy</i>'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-circle btn-icon-only btn-default tooltips t-pdf',
+                    text: '<i class="fa fa-file-pdf-o">pdf</i>',
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-circle btn-icon-only btn-default tooltips t-excel',
+                    text: '<i class="fa fa-file-excel-o">excel</i>',
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn btn-circle btn-icon-only btn-default tooltips t-csv',
+                    text: '<i class="fa fa-file-text-o">csv </i>',
+                },
+
+            ],
+            columns: [{
+                    data: 'ATCN_PK'
+                },
+                {
+                    data: 'ATCN_FK_canal'
+                },
+                {
+                    data: 'ATCN_date_down'
+                },
+                {
+                    data: 'ATCN_date_up'
+                },
+                {
+                    data: 'ATCN_descripcion'
+                },
+
+            ],
+            pageLength: 10,
+        });
+
+        $("#frm_agregar_caida").submit(function(ev) {
+            ev.preventDefault();
+            $.ajax({
+                url: '{{ base_url() }}Canales/agregarCaida',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(data, xhr) {
+                    $("#sample_1").DataTable().ajax.reload();
+                    $('#exampleModal').modal('hide');
+                    $("#frm_agregar_caida")[0].reset();
+                },
+                error: function(xhr) {
+
+                }
+
+            });
+        });
+
+       $('#atras').on('click', function(e) {
+            e.preventDefault();
+            var url = 'Canales/';
+           window.location.replace('{{ base_url() }}'+url);
+        });
+
+
+    });
+
+</script>

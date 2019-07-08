@@ -1,0 +1,72 @@
+{% for datos in inf %}
+<div class="card-header">
+    <h4 class="card-title"> Canales caidos </h4>
+</div>
+<div class="card-body">
+    {{form_open(base_url('Welcome/validate'),'id="frm_editar_caida"')}}
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">No.solicitud</label>
+        <input type="TEXT" class="form-control" id="ATCN_PK" name="ATCN_PK" readonly onmousedown="return false;" value="{{ datos.ATCN_PK }}">
+
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">ID SICOV</label>
+        <input type="TEXT" class="form-control" id="ATCN_FK_canal" name="ATCN_FK_canal" readonly onmousedown="return false;" value="{{ datos.ATCN_FK_canal }}">
+
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">Fecha caida</label>
+        <input type="text" name="ATCN_date_down" id="ATCN_date_down" class="form-control" value="{{ datos.ATCN_date_down }}">
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">Fecha de subida</label>
+        <input type="datetime-local" name="ATCN_date_up" id="ATCN_date_up" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">ERROR</label>
+        <textarea class="form-control" id="ATCN_descripcion" name="ATCN_descripcion"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">CULPABLE</label>
+        <select class="form-control" id="	ATCN_id_problem" name="	ATCN_id_problem">
+            <option value="1">1 - SICOV</option>
+            <option value="2">2 - UNE</option>
+            
+        </select>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" id="atras" name="atras" class="btn btn-secondary back" data-dismiss="modal">Atras</button>
+        <button type="submit" class="btn btn-success">Agregar canal caido</button>
+    </div>
+</div>
+{{form_close()}}
+{% endfor %}
+
+<script>
+    $(document).ready(function() {
+        $("#frm_editar_caida").submit(function(ev) {
+            ev.preventDefault();
+            $.ajax({
+                url: '{{ base_url()}}Canales/modificarCanal',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(data, xhr) {
+                    var url = 'Canales';
+                    window.location.replace('{{ base_url() }}' + url);
+                },
+                error: function(xhr) {
+
+                }
+
+            });
+        });
+
+        $("#atras").on('click', function(e) {
+            e.preventDefault();
+            var url = 'Canales';
+            window.location.replace('{{ base_url() }}' + url);
+        });
+    });
+
+</script>

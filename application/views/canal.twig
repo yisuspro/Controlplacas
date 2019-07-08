@@ -1,0 +1,260 @@
+{% import "tools/menu.twig" as menus %}
+{% import "tools/forms.twig" as form %}
+{% extends "tools/dashboard_base.twig" %}
+
+{% block title %}login{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<!-- modal-->
+<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class=" modal-title" id="exampleModalLabel">REPORTE DE CAIDAS</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{form_open(base_url('Welcome/validate'),'id="frm_reporte"')}}
+
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Fecha inicio</label>
+                    <input type="date" name="date1" id="date1" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Fecha final {% set fecha = date() %} {{ fecha.date }}</label>
+                    <input type="date" name="date2" id="date2" class="form-control" max=" {{ fecha.date }}" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Atras</button>
+                <button type="button" class="btn btn-success" id="reporte">Buscar</button>
+            </div>
+            {{form_close()}}
+        </div>
+    </div>
+</div>
+<!-- end modal-->
+<!-- modal-->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class=" modal-title" id="exampleModalLabel">Agregar canal caido</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{form_open(base_url('Welcome/validate'),'id="frm_agregar_caida"')}}
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">ID SICOV</label>
+                    <select class="form-control" id="CDA_PK" name="CDA_PK">
+                        {% for datos in data %}
+                        <option value="{{ datos.CDA_PK }}">{{ datos.CDA_PK }} - {{ datos.CDA_lastname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Fecha caida</label>
+                    <input type="datetime-local" name="ATCN_date_down" id="ATCN_date_down" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Atras</button>
+                <button type="submit" class="btn btn-success">Agregar canal caido</button>
+            </div>
+            {{form_close()}}
+        </div>
+    </div>
+</div>
+<!-- end modal-->
+
+{{ menus.menu()}}
+<div class="main-panel" id="main-panel">
+    {{ menus.menu_2()}}
+    <div style="height: 62px; "></div>
+    <div class="card">
+        <div class="contentAjax">
+            <div class="card-header">
+                <h4 class="card-title"> Canales caidos </h4>
+            </div>
+            <div style="margin-left: 30px;" class="row">
+                {{ form.buttom_modal('agregar','fa fa-plus','Agregar un curso','','success','1')}}
+                <a id="reporte" href="javascript:;" class="btn btn-simple btn-icon btn-warning reporte" title="Generar reporte" data-toggle="modal" data-target="#exampleModal2"><i class="fa fa-file"></i></a>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive ">
+                    <div class="datagrid">
+                        <table id="sample_1" class="display" style="width:100% ;font-size: small;">
+                            <thead class="text-primary">
+                                <th>
+                                    ID CANAL
+                                </th>
+                                <th>
+                                    CANAL
+                                </th>
+                                <th>
+                                    CDA
+                                </th>
+                                <th>
+                                    ESTADO
+                                </th>
+                                <th>
+                                    ACCIONES
+                                </th>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block footer %}
+{% endblock %}
+
+
+
+{% endblock %}
+
+{% block java %}
+
+<script>
+    $(document).ready(function() {
+        var dt;
+        dt = $('#sample_1');
+        dt.DataTable({
+            lengthMenu: [
+                [5, 10, 25, 50, -1],
+                [5, 10, 25, 50, "Todo"],
+            ],
+            "order": [
+                [3, "asc"]
+            ],
+            "ajax": {
+                url: "{{ base_url() }}Canales/listarCanales",
+                type: 'GET'
+            },
+            "scrollX": true,
+            dom: 'Bfrtip',
+            buttons: [{
+                    extend: 'print',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-print',
+                    text: '<i class="fa fa-print"></i>'
+                },
+                {
+                    extend: 'copy',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-copy',
+                    text: '<i class="fa fa-files-o">copy</i>'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-pdf',
+                    text: '<i class="fa fa-file-pdf-o">pdf</i>',
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-excel',
+                    text: '<i class="fa fa-file-excel-o">excel</i>',
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn btn-circle btn-icon-only btn-success tooltips t-csv',
+                    text: '<i class="fa fa-file-text-o">csv </i>',
+                },
+
+            ],
+            columns: [{
+                    data: 'CANL_PK'
+                },
+                {
+                    data: 'CANL_canal'
+                },
+                {
+                    data: 'CDA_lastname',
+                },
+                {
+                    data: 'STCN_stats',
+                },
+
+                {
+                    "defaultContent": "<button id='historial' name='historial' title='Ver Historial' type='button' class='form btn btn-success btn-xs history'> <span class='fas fa-align-left'></span></button><button id='eliminar' name='eliminar' title='Actualizar estado del canal' type='button' class='form btn btn-warning btn-xs remove'> <span class='fas fa-sync'></span></button>"
+                },
+            ],
+            pageLength: 10,
+            rowCallback: function(row, data) {
+                if (data['STCN_stats'] == "UP") {
+                    $($(row).find("td")[3]).css("background-color", "#90EE90");
+                    $($(row).find("td")[3]).css("color", "#000000");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                } else {
+                    $($(row).find("td")[3]).css("background-color", "#FF0000");
+                    $($(row).find("td")[3]).css("color", "#ffffff");
+                    $($(row).find("td")[3]).css("font-weight", "900");
+                }
+            },
+        });
+
+        $("#frm_agregar_caida").submit(function(ev) {
+            ev.preventDefault();
+            $.ajax({
+                url: '{{ base_url() }}Canales/agregarCaida',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(data, xhr) {
+                    $("#sample_1").DataTable().ajax.reload();
+                    $('#exampleModal').modal('hide');
+                    $("#frm_agregar_caida")[0].reset();
+                },
+                error: function(xhr) {
+
+                }
+
+            });
+        });
+
+
+
+        dt.on('click', '.remove', function(e) {
+            e.preventDefault();
+            $tr = $(this).closest('tr');
+            var O = dt.DataTable().row($tr).data();
+            var url = 'Canales/editarCanal/' + O.CANL_PK;
+            $(".contentAjax").load(url);
+        });
+
+
+        dt.on('click', '.history', function(e) {
+            e.preventDefault();
+            $tr = $(this).closest('tr');
+            var O = dt.DataTable().row($tr).data();
+            var url = 'Canales/verActividadCanal/' + O.CANL_PK;
+            $(".contentAjax").load(url);
+        });
+
+        $("#reporte").on('click', function(e) {
+            e.preventDefault();
+            var date1 = $("#date1").val();
+            var date2 = $("#date2").val();
+            if (date1 == '' || date2 == '') {
+                alert('PORFAVOR DIGITE UNA FECHA VALIDA')
+            } else {
+                var url = '{{ base_url() }}Canales/reporteFechas/' + date1 + '/' + date2;
+                window.location.replace(url);
+            }
+
+
+        });
+
+    });
+
+</script>
+{% endblock %}
